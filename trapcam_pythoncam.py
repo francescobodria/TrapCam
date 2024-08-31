@@ -24,23 +24,24 @@ if os.listdir(work_path)==[]:
 	start = time.time()
 	#100 e' la durata
 	while(time.time()<start+waiting_time):
-    		if(GPIO.input(10)):   #se la variabile del pin e' vera
+		if(GPIO.input(10)):   #se la variabile del pin e' vera
   			#impostazioni fotocamera
 			camera.exposure_mode = 'auto'
 			camera.meter_mode = 'average'
 			camera.awb_mode = 'auto'
 			camera.image_effect = 'none'
 			camera.resolution = (1024, 768)
-      			nomefile = 'image'+str(e)+'.jpg'
+			nomefile = 'image'+str(e)+'.jpg'
 			camera.capture(nomefile)
 			print("foto scattata")
 			e=e+1
 			print(e)
 			time.sleep(1)
-    		else:
-        		print("niente da segnalare")
-			time.sleep(1)
-else : print 'error'
+		else:
+			print("niente da segnalare")
+		time.sleep(1)
+else : 
+	print('error')
 
 GPIO.cleanup()
 
