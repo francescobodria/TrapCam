@@ -1,45 +1,43 @@
 import time
 import os
 import RPi.GPIO as GPIO
+from datetime import datetime, time
 
-work_path = '/home/pi/Trapcam/data'
-time_to_wait=60. #time to sleep before start in second
-num_photo=5000 #max number of photo
+work_path = '/home/pi/TrapCam/data'
+SENSOR_PIN = 4
+SLEEP_TIME = 1 # seconds to wait before retrying
+VIDEO_SECONDS = 10 # seconds of video duration
 
+# Define the start and end times
+start_time = time(5, 0, 0)  # 8:00 AM
+end_time = time(10, 0, 0)   # 10:00 AM
 
 # Define a function to use each time the sensor is triggered
-def photo():
+def video(duration):
     # First capture a quick video of the scene
-    cmd="raspivid -o /home/pi/Trapcam/data/video"+str(i)+".h264 -t 10000"
+    cmd=f"libcamera-vid -o {work_path}/video"+str(datetime.now()).replace(" ","_")+f".h264 -t {duration*1000}"
     os.system(cmd)
-    time.sleep(1)
-    j=1
-    # While the trigger is still active (pin 10 at 3v)...
-    while(GPIO.input(10)):
-        # ... keep taking photos
-        cmd="raspistill -o /home/pi/Trapcam/data/image"+str(i)+"_"+str(j)+".jpg"
-        os.system(cmd)
-        j=j+1
     return
 
 # Set up the GPIO pins
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(10,GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 #initial try
-if os.listdir(work_path)==[]:
-	GPIO.wait_for_edge(10,GPIO.RISING)
-	cmd0='raspistill -o /home/pi/Trapcam/prova.jpg'
-	os.system(cmd0)
-	time.sleep(time_to_wait)
+while not GPIO.input(SENSOR_PIN):
+    time.sleep(1)
+cmd0=f'libcamera-still -t 1 -o {work_path}/test.jpg'
+os.system(cmd0)
 
-
-# For the first x triggers on pin 10
-if os.listdir(work_path)==[]:
-    for i in range(num_photo):
-        # At the moment it is triggered (voltage on pin 10 rising to 3v)...
-        GPIO.wait_for_edge(10,GPIO.RISING)
-        # ... use the function photo() to take a video/photo
-        photo()
+#  main loop
+while True:
+    # Get the current time
+    if start_time <= datetime.now().time() <= end_time and GPIO.input(SENSOR_PIN):
+        # At the moment it is triggered (voltage on pin 10 rising to 3v) take video
+        video(VIDEO_SECONDS)
+    elif datetime.now().time() > end_time:
+        break
+    else:
+        time.sleep(SLEEP_TIME)
 
 GPIO.cleanup() 

@@ -1,5 +1,0 @@
-#!/bin/bash
-#scatta una foto nella directory corrente
-
-raspistill -o test.jpg
-raspivid -o test.h264
