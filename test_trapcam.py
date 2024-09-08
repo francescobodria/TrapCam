@@ -9,8 +9,8 @@ SLEEP_TIME = 1 # test ever SLEEP_TIME seconds
 TRIGGER_NBR = 10 # number of tests 
 
 # Define a function to use each time the sensor is triggered
-def photo():
-    cmd=f"libcamera-still -t 1 -o {work_path}/image_"+str(datetime.now()).replace(" ","_")+".jpg"
+def video():
+    cmd=f"libcamera-vid -t 10000 -o {work_path}/video_test_"+str(datetime.now()).replace(" ","_")+".h264"
     os.system(cmd)
     return
 
@@ -18,14 +18,13 @@ def photo():
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-# For the first 10 triggers on pin 10
+# For the first 10 triggers on pin SENSOR_PIN
 for i in range(TRIGGER_NBR):
-    # At the moment it is triggered (voltage on pin 10 rising to 3v)...
+    # At the moment it is triggered (voltage on pin SENSOR_PIN rising)
     level = GPIO.input(SENSOR_PIN)
-    print(level)
     if level:
         # ... use the function photo() to take a video/photo
-        photo()
+        video()
     else:
         time.sleep(SLEEP_TIME)
 

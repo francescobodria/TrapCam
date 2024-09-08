@@ -9,8 +9,8 @@ SLEEP_TIME = 1 # seconds to wait before retrying
 VIDEO_SECONDS = 10 # seconds of video duration
 
 # Define the start and end times
-start_time = time(5, 0, 0)  # 8:00 AM
-end_time = time(10, 0, 0)   # 10:00 AM
+start_time = time(5, 0, 0)  
+end_time = time(10, 0, 0)   
 
 # Define a function to use each time the sensor is triggered
 def video(duration):
@@ -33,7 +33,7 @@ os.system(cmd0)
 while True:
     # Get the current time
     if start_time <= datetime.now().time() <= end_time and GPIO.input(SENSOR_PIN):
-        # At the moment it is triggered (voltage on pin 10 rising to 3v) take video
+        # At the moment it is triggered (voltage on pin SENSOR_PIN rising) take video
         video(VIDEO_SECONDS)
     elif datetime.now().time() > end_time:
         break
