@@ -12,3 +12,8 @@ sudo nmcli connection modify TrapCam wifi-sec.psk "TrapCam123"  # Must be 8+ cha
 
 # 4. Activate the hotspot
 sudo nmcli connection up TrapCam
+
+# 5. go back to home network
+nmcli connection show #list configured connections
+sudo nmcli connection up preconfigured
+
