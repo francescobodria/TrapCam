@@ -9,10 +9,11 @@ SENSOR_PIN = 17
 IR_LED_PIN = 10 
 SLEEP_TIME = 1 # seconds to wait before retrying
 VIDEO_SECONDS = 10 # seconds of video duration
+INITIAL_TRY = True
 
 # Define the start and end times
-start_time = time(0, 0, 0)  
-end_time = time(10, 0, 0)   
+start_time = time(21, 0, 0)  
+end_time = time(6, 0, 0)   
 
 # Define a function to use each time the sensor is triggered
 def video(duration):
@@ -31,16 +32,19 @@ ir = DigitalOutputDevice(IR_LED_PIN)
 print('STARTING...')
 
 #initial try
-while not GPIO.input(SENSOR_PIN):
-    sleep(1)
-    print('waiting for input...')
-cmd0=f'libcamera-still -t 1 -o {work_path}/test.jpg'
-os.system(cmd0)
+if INITIAL_TRY:
+    while not GPIO.input(SENSOR_PIN):
+        sleep(1)
+        print('waiting for input...')
+    ir.on()
+    cmd0=f'libcamera-still -t 1 -o {work_path}/test.jpg'
+    os.system(cmd0)
+    ir.off()
 
 #  main loop
 while True:
     # Get the current time
-    if start_time <= datetime.now().time() <= end_time and GPIO.input(SENSOR_PIN):
+    if (start_time <= datetime.now().time() or datetime.now().time() <= end_time) and GPIO.input(SENSOR_PIN):
         # At the moment it is triggered (voltage on pin SENSOR_PIN rising) take video
         ir.on()
         video(VIDEO_SECONDS)

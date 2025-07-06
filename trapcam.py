@@ -8,6 +8,7 @@ SENSOR_PIN = 17
 IR_LED_PIN = 10 
 SLEEP_TIME = 1 # seconds to wait before retrying
 VIDEO_SECONDS = 10 # seconds of video duration
+INITIAL_TRY = True
 
 # Define the start and end times
 start_time = time(0, 0, 0)  
@@ -24,12 +25,15 @@ def video(duration):
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
+print('STARTING...')
+
 #initial try
-while not GPIO.input(SENSOR_PIN):
-    sleep(1)
-    print('waiting for input...')
-cmd0=f'libcamera-still -t 1 -o {work_path}/test.jpg'
-os.system(cmd0)
+if INITIAL_TRY:
+    while not GPIO.input(SENSOR_PIN):
+        sleep(1)
+        print('waiting for input...')
+    cmd0=f'libcamera-still -t 1 -o {work_path}/test.jpg'
+    os.system(cmd0)
 
 #  main loop
 while True:
