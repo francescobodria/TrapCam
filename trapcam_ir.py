@@ -2,6 +2,7 @@ from time import sleep
 import os
 import RPi.GPIO as GPIO
 from datetime import datetime, time
+from gpiozero import PWMOutputDevice, DigitalOutputDevice
 
 work_path = '/home/trapcam/TrapCam/data'
 SENSOR_PIN = 17
@@ -24,6 +25,11 @@ def video(duration):
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
+# Set up IR
+ir = DigitalOutputDevice(IR_LED_PIN)
+
+print('STARTING...')
+
 #initial try
 while not GPIO.input(SENSOR_PIN):
     sleep(1)
@@ -36,7 +42,9 @@ while True:
     # Get the current time
     if start_time <= datetime.now().time() <= end_time and GPIO.input(SENSOR_PIN):
         # At the moment it is triggered (voltage on pin SENSOR_PIN rising) take video
+        ir.on()
         video(VIDEO_SECONDS)
+        ir.off()
     elif datetime.now().time() > end_time:
         break
     else:
